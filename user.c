@@ -9,10 +9,10 @@
 
 unsigned short procs;
 process *virus_proc;
-struct process{
+typedef struct process{
 	char *name;
 	int pid;
-}
+} process;
 
 int main(int argc, char* argv[]) {
 
@@ -31,10 +31,16 @@ int main(int argc, char* argv[]) {
 		syscall(HIJACKED_SYSCALL, buffer, procs);
 	
 		//Parse buffer, place matches to virus file in virus_proc
+		//Currently Searches process with user input name
+
+		
+		//virus_proc = malloc(20*sizeof(process));
 
 		//User prompt to rename files
 
-		//rename files
+		//Obtain exe path from readlink /proc/PID/exe
+
+		//rename files using path
 
 	}
 

@@ -11,7 +11,6 @@
 #include <linux/slab.h>
 #include <linux/sched/signal.h>
 
-#define MAX_PROCESS_NUMBER 65535
 #define MAX_NAME_LENGTH	256
 #define STS_CALL_TABLE "sys_call_table"
 #define SYSCALL_NI __NR_tuxcall
@@ -30,11 +29,11 @@ static void *original_syscall = NULL;
 static void *original_syscall2 = NULL;
 static char buff[40];
 
-struct process 
+typedef struct process 
 { 
    char *name; 
    int pid; 
-};
+} process;
 
 //struct that holds name and pid for all processes	
 process *all_proc;
@@ -44,6 +43,7 @@ static unsigned long process_syscall(process *buf, int size){
 
 	unsigned short procnum = 0;
 	get_user(procnum, size);
+	//TODO Error handling
 
 	struct task_struct *task;
 
@@ -58,7 +58,14 @@ static unsigned long process_syscall(process *buf, int size){
 	all_proc[i].name = task->comm;
 	all_proc[i].pid = task->pid;
 	i++;
+	
+	//TODO Error handling
+	
+	
 
+	//Copy to User
+	process buffer[procnum]
+	
 	//Free memory
 	kfree(all_proc);
 
