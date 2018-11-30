@@ -20,7 +20,7 @@ typedef struct process{
 
 int main(int argc, char* argv[]) {
 	
-	//User selects function
+	//User selects to scan processes or files
 	int input = 0;
 	printf ("Select a function to execute\n");
 	printf ("1) Scan Processes\n");
@@ -40,14 +40,17 @@ int main(int argc, char* argv[]) {
 		//Syscall to scan process
 		printf("Scanning processes");
 		syscall(HIJACKED_SYSCALL, buffer, procs);
+		//return array of structs containing running processes and their pids
 	
-		//Parse buffer, place matches to virus file in virus_proc
+		//search scanned processes in buffer, compare to known viruses, store possible matches
+
 		//Display all or search for input
 		int pselect = 0;
 		fprintf("Select an option\n");
 		fprintf("1) Display all processes");
 		fprintf("2) Search for specific process");
 		scanf("%d", pselect);
+
 		//Display all processes
 		if (pselect == 1){
 	
@@ -55,7 +58,7 @@ int main(int argc, char* argv[]) {
 				printf("%s\n", buffer[i].name);
 			}
 		}
-		//Search for specific process using name	
+		//Search for specific process using name, add to possible viruses	
 		else {
 			fprintf("Enter name to search for\n");
 			char name[MAX_NAME_LENGTH];
@@ -69,20 +72,24 @@ int main(int argc, char* argv[]) {
 		}
 				
 
-		//virus_proc = malloc(20*sizeof(process));
 
-		//User prompt to rename files
+		//virus_proc = malloc(20*sizeof(process));	- create array of structs to store possible viruses
+
+
+
+		//Display possible virueses, prompt user to choose to rename files
 
 		//Obtain exe path from readlink /proc/PID/exe
 
-		//rename files using path
+		//kill process, rename files at path by changing .exe extension to .virus
 
 	}
 
+	//user chooses to search files
 	if(input == 2){
 		
-		//Scan memory for virus patterns
-		//Open file, parse file
+		//Scan memory for virus signatures, compare to blacklist, offer to rename
+		
 
 	}
 

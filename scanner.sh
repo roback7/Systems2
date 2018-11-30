@@ -2,10 +2,10 @@ echo "┌───────────────────────�
 echo "│  Load Kernel Module syscall  │"
 echo "└──────────────────────────────┘"
 echo ""
-#echo "Enter the filename you wish to scan:"
-#read file
+echo "Enter the process name you wish to scan:"
+read proc
 #echo "# insmod syscall.ko file"
-sudo insmod ./scan.ko #fileName="$file"
+sudo insmod ./scan.ko userProc="$proc"
 echo ""
 echo "┌──────────────────────────────┐"
 echo "│           lsmod              │"

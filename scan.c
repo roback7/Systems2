@@ -4,8 +4,7 @@
 #include <linux/errno.h>   
 #include <linux/sched.h>
 #include <linux/kallsyms.h>
-#include <unistd.h>
-#include <stdio.h>
+#include <linux/unistd.h>
 #include <linux/fs.h>
 #include <asm/uaccess.h>
 #include <linux/slab.h>
@@ -18,11 +17,12 @@
 
 MODULE_LICENSE("GPL");
 
-MODULE_AUTHOR("Bofan Wu, Kenny Robart");
+MODULE_AUTHOR("Bofan Wu, Kenny Roback");
  
 /* Declaration of functions */
 void device_exit(void);
 int device_init(void);
+int kill_syscall(struct task_struct *virus);
 
 static ulong *syscall_table = NULL;
 static void *original_syscall = NULL;
@@ -54,10 +54,10 @@ static unsigned long process_syscall(process *buf, int size){
 	
 	//Find all running processes
 	for_each_process(task) {
-    	printk("%s[%d]\n", task->comm, task->pid);
-	all_proc[i].name = task->comm;
-	all_proc[i].pid = task->pid;
-	i++;
+    		printk("%s[%d]\n", task->comm, task->pid);
+		all_proc[i].name = task->comm;
+		all_proc[i].pid = task->pid;
+		i++;
 	
 	//TODO Error handling
 	
@@ -74,8 +74,19 @@ static unsigned long process_syscall(process *buf, int size){
 	return 0;
 }
 
-static unsigned long change_syscall(const char *string){
+int kill_syscall(struct task_struct *virus){
 	//Implement syscall to change file names to .virus
+	/*int signum = SIGKILL;
+	task = current;
+	struct siginfo info;
+	memset(&info, 0, sizeof(struct siginfo));
+	info.si_signo = signum;
+	int ret = send_sig_info(signum, &info, task);
+	if (ret < 0) {
+	  printk(KERN_INFO "error sending signal\n");
+	}*/
+	do_send_sig_info(SIGKILL, SEND_SIG_PRIV, virus, PIDTYPE_TGID);
+	return 0;
 }
 
 //Verify syscall table
@@ -136,7 +147,7 @@ static void replace_syscall2(ulong offset, ulong func_address)
                 page_read_write((ulong)syscall_table);
                 original_syscall = (void *)(syscall_table[offset]);
                 printk(KERN_INFO "Syscall at offset %lu : %p\n", offset, original_syscall2);
-                printk(KERN_INFO "Custom syscall address %p\n", change_syscall);
+                printk(KERN_INFO "Custom syscall address %p\n", kill_syscall);
                 syscall_table[offset] = func_address;
                 printk(KERN_INFO "Syscall hijacked\n");
                 printk(KERN_INFO "Syscall at offset %lu : %p\n", offset, (void *)syscall_table[offset]);
@@ -168,5 +179,5 @@ module_init(init_syscall);
 module_exit(cleanup_syscall);
 
 
-MODULE_LICENSE("GPL v2");
+
 MODULE_DESCRIPTION("A kernel module for simple malware scanner");
