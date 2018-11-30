@@ -8,7 +8,7 @@
 ## Last update Fri Apr 18 22:13:46 2014 xsyann
 ##
 
-TARGET	= scan
+TARGET	= test
 
 obj-m	+= $(TARGET).o
 
