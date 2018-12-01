@@ -19,10 +19,6 @@
 MODULE_LICENSE("GPL");
 
 MODULE_AUTHOR("Bofan Wu, Kenny Robart");
- 
-/* Declaration of functions */
-void device_exit(void);
-int device_init(void);
 
 static ulong *syscall_table = NULL;
 static void *original_syscall = NULL;
@@ -39,39 +35,35 @@ typedef struct process
 process *all_proc;
 
 //syscall to scan all processes
-static unsigned long process_syscall(process *buf, int size){
-
-	unsigned short procnum = 0;
-	get_user(procnum, size);
-	//TODO Error handling
+static unsigned long process_syscall(int size, int select, process *procs){
+	
+	unsigned long result = 0; //Error checking
 
 	struct task_struct *task;
 
 	//Allocate memory for all_proc
-	all_proc = kmalloc(procnum * sizeof(process), GFP_KERNEL);
+	all_proc = kmalloc(size * sizeof(process), GFP_KERNEL);
 
 	int i=0;
 	
 	//Find all running processes
 	for_each_process(task) {
-    	printk("%s[%d]\n", task->comm, task->pid);
 	all_proc[i].name = task->comm;
 	all_proc[i].pid = task->pid;
 	i++;
+	}
+
+	//Copy_to_user all_proc
+	int error = copy_to_user(procs, all_procs, size * sizeof(process));
+	if (error){
+		printk(KERN_INFO "Failed to copy all_proc");
+		return error;
+	}
 	
 	//TODO Error handling
-	
-	
 
-	//Copy to User
-	process buffer[procnum]
-	
-	//Free memory
 	kfree(all_proc);
-
-	//Copy proc names and PID to user space
-	
-	return 0;
+	return result;
 }
 
 static unsigned long change_syscall(const char *string){
