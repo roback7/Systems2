@@ -4,15 +4,15 @@
 #include <linux/errno.h>   
 #include <linux/sched.h>
 #include <linux/kallsyms.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <linux/fs.h>
 #include <asm/uaccess.h>
 #include <linux/slab.h>
 #include <linux/sched/signal.h>
+#include <linux/unistd.h>
+#include <linux/syscalls.h>
 
 #define MAX_NAME_LENGTH	256
-#define STS_CALL_TABLE "sys_call_table"
+#define SYS_CALL_TABLE "sys_call_table"
 #define SYSCALL_NI __NR_tuxcall
 #define SYSCALL_NI2 __NR_security
 
@@ -54,7 +54,7 @@ static unsigned long process_syscall(int size, int select, process *procs){
 	}
 
 	//Copy_to_user all_proc
-	int error = copy_to_user(procs, all_procs, size * sizeof(process));
+	int error = raw_copy_to_user(procs, all_proc, size * sizeof(process));
 	if (error){
 		printk(KERN_INFO "Failed to copy all_proc");
 		return error;
@@ -73,7 +73,7 @@ static unsigned long change_syscall(const char *string){
 //Verify syscall table
 static int is_syscall_table(ulong *p)
 {
-        return ((p != NULL) && (p[__NR_close] == (ulong)sys_close));
+        return ((p != NULL) && (p[__NR_close] == (ulong)ksys_close));
 }
 
 //Override syscall table write lock

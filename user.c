@@ -129,7 +129,6 @@ int main(int argc, char* argv[]) {
 		//Open file, parse file
 		//User prompt to rename files
 
-		//struct dirent *de;  // Pointer for directory entry
 		char *directory;
 		char *find;
 		
@@ -159,32 +158,6 @@ int main(int argc, char* argv[]) {
 				printf("File/Signature not found in directory!");
 			}
 
-		
-
-    // opendir() returns a pointer of DIR type.  
-    /*DIR *dr = opendir(directory); 
-
-  
-    if (dr == NULL)  // opendir returns NULL if couldn't open directory 
-    { 
-        printf("Could not open current directory" ); 
-        return 0; 
-    } 
-  
-    // Refer http://pubs.opengroup.org/onlinepubs/7990989775/xsh/readdir.html 
-    // for readdir() 
-
-	int i = 0;
-    while ((de = readdir(dr)) != NULL) 
-            printf("%s\n", de->d_name); 
-    closedir(dr);     
-    return 0; 
-	}
-	else {
-		printf("Invalid Input");
-		return 0;
-	} */
-	
 return 0;
 
 
