@@ -14,10 +14,10 @@ echo "$ lsmod | grep 'syscall'"
 lsmod | grep "scan"
 echo ""
 echo "┌──────────────────────────────┐"
-echo "│           Test               │"
+echo "│           User               │"
 echo "└──────────────────────────────┘"
 echo "$ ./test $1"
-./test/test $1
+./user $1
 echo ""
 echo "┌──────────────────────────────┐"
 echo "│ Unload Kernel Module syscall │"

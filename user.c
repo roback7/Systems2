@@ -10,7 +10,8 @@
 
 #define MAX_NAME_LENGTH 256
 #define HIJACKED_SYSCALL __NR_tuxcall
-#define HIJACKED_SYSCALL2 __NR_security
+
+int sizeProc[1];
 
 int files = 0;
 unsigned short procs;
@@ -20,20 +21,17 @@ typedef struct process{
 } process;
 
 
-
-//TODO Error handling
-
 int main(int argc, char* argv[]) {
 	
 	//Known virus signatures
-	char * signatures[] = {"DD7A0BA8", "1AA1E86F", "9A6231DC", "A5FB507D", "3A76C92", "2523B959", 
+	char  *signatures[13] = {"DD7A0BA8", "1AA1E86F", "9A6231DC", "A5FB507D", "3A76C92", "2523B959", 
 				"CC4F1D8D", "8000D3AD", "C8B4593", "6CF483F9", "B6CB4EAF", "F11602A1", "36118429"};
 
 	//User selects function
 	int function = 0;
 	printf ("Select a function to execute\n");
 	printf ("1) Scan Processes\n");
-	printf ("2) Scan files\n");
+	printf ("2) Scan Files\n");
 	scanf ("%d", &function);
 
 	//Scan Processes
@@ -42,25 +40,31 @@ int main(int argc, char* argv[]) {
 		//Obtain number of running processes
 		struct sysinfo info;
 		sysinfo (&info);
+
 		procs = info.procs;
+		unsigned long test = procs*sizeof(process);
+		
 		process *all_procs = malloc(procs*sizeof(process));
 		
-
-		printf("Scanning processes");
+		printf("Scanning processes\n");
 		int size = sizeof(all_procs)/sizeof(all_procs[0]);
 
 
 		//Display all or search for input
 		int pselect = 0;
 		printf("Select an option\n");
-		printf("1) Display all processes");
-		printf("2) Search for specific process");
+		printf("1) Display all processes\n");
+		printf("2) Search for specific process\n");
 		scanf("%d", &pselect);
 
 		char name[MAX_NAME_LENGTH];
 
 		//Syscall to scan processes
-		int error = syscall(HIJACKED_SYSCALL, procs, pselect-1, all_procs);
+
+		sizeProc[0] = size;
+		
+		int error = syscall(HIJACKED_SYSCALL, sizeProc, all_procs);
+		
 		if (error){
 			printf("Error performing system call");
 		}
@@ -85,7 +89,7 @@ int main(int argc, char* argv[]) {
 					printf("%s\n %d",all_procs[i].name, all_procs[i].pid);
 					printf("Process found\n");
 					printf("Kill process? (y/n) (%d Processes left to be 							searched)\n", size-i);
-					char kselect;
+					char kselect = NULL;
 					scanf("%c", kselect);
 					if (kselect == 'y' || kselect == 'Y'){
 
@@ -134,13 +138,13 @@ int main(int argc, char* argv[]) {
 		
 		directory = malloc(100*sizeof(char));
 		find = malloc(100*sizeof(char));
-		int choice;
+		int choice = 1;
 		printf("Enter the directory to search:\n");
 		scanf("%s", directory);
 
 		printf("1) Scan %s for known virus signatures\n", directory);
 		printf("2) Input file name or signature to scan for in %s\n", directory);
-		scanf("%d", choice);
+		scanf("%d", &choice);
 
 		if (choice == 1) {
 			for (int i = 0; i < 13; i++) {
@@ -149,13 +153,13 @@ int main(int argc, char* argv[]) {
 
 			}
 		}
-		else if (choice == 2) {
+		if (choice == 2) {
 			printf("Enter the file to search for:\n");
 			scanf("%s", find);
 			listdir(directory, find);
 		}
 		if (files == 0){
-				printf("File/Signature not found in directory!");
+				printf("File/Signature not found in directory!\n");
 			}
 
 return 0;
