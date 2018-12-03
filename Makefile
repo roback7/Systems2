@@ -1,10 +1,9 @@
 ##
-## Makefile for virus scanner**
+## Makefile for lkm-syscall
 ##
-## Originally made by xsyann, updated by Kenny Roback
+## Made by xsyann
 ## Contact <contact@xsyann.com>
 ##
-<<<<<<< HEAD
 ## Started on  Wed Mar 26 13:49:00 2014 xsyann
 ## Last update Fri Apr 18 22:13:46 2014 xsyann
 ##
@@ -12,16 +11,12 @@
 TARGET	= test
 
 obj-m	+= $(TARGET).o
-=======
-## Current version built by Yuan Xiao
-## Contact <xiao.465@osu.edu>
->>>>>>> e6dfba798e4358753b73d761ac16e27abb078522
 
+CURRENT = $(shell uname -r)
+KDIR	= /lib/modules/$(CURRENT)/build
 
 all:
-	cd kernel; make
-	cd userSpace; make
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 clean:
-	cd kernel; make clean
-	cd userSpace; make clean
+	$(MAKE) -C $(KDIR) M=$(PWD) clean

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 echo "┌──────────────────────────────┐"
 echo "│  Load Kernel Module syscall  │"
 echo "└──────────────────────────────┘"
@@ -31,10 +30,3 @@ echo "│           dmesg              │"
 echo "└──────────────────────────────┘"
 echo "$ dmesg"
 dmesg | tail -n 15
-=======
-echo "Loading virus scanner..."
-sudo insmod ./kernel/scan.ko
-sudo ./userSpace/user $1
-sudo rmmod scan
-dmesg | tail -n 1
->>>>>>> e6dfba798e4358753b73d761ac16e27abb078522
