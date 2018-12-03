@@ -4,10 +4,6 @@
 #include <linux/errno.h>   
 #include <linux/sched.h>
 #include <linux/kallsyms.h>
-<<<<<<< HEAD:scan.c
-#include <linux/unistd.h>
-=======
->>>>>>> e6dfba798e4358753b73d761ac16e27abb078522:kernel/scan.c
 #include <linux/fs.h>
 #include <asm/uaccess.h>
 #include <linux/slab.h>
@@ -23,14 +19,6 @@
 MODULE_LICENSE("GPL");
 
 MODULE_AUTHOR("Bofan Wu, Kenny Roback");
-<<<<<<< HEAD:scan.c
- 
-/* Declaration of functions */
-void device_exit(void);
-int device_init(void);
-int kill_syscall(struct task_struct *virus);
-=======
->>>>>>> e6dfba798e4358753b73d761ac16e27abb078522:kernel/scan.c
 
 static ulong *syscall_table = NULL;
 static void *original_syscall = NULL;
@@ -59,41 +47,6 @@ static unsigned long process_syscall(int sizeUser, process *procs){
 	//Find all running processes
         int i = 0;
 	for_each_process(task) {
-<<<<<<< HEAD:scan.c
-    		printk("%s[%d]\n", task->comm, task->pid);
-		all_proc[i].name = task->comm;
-		all_proc[i].pid = task->pid;
-		i++;
-	
-	//TODO Error handling
-	
-	
-
-	//Copy to User
-	process buffer[procnum]
-	
-	//Free memory
-	kfree(all_proc);
-
-	//Copy proc names and PID to user space
-	
-	return 0;
-}
-
-int kill_syscall(struct task_struct *virus){
-	//Implement syscall to change file names to .virus
-	/*int signum = SIGKILL;
-	task = current;
-	struct siginfo info;
-	memset(&info, 0, sizeof(struct siginfo));
-	info.si_signo = signum;
-	int ret = send_sig_info(signum, &info, task);
-	if (ret < 0) {
-	  printk(KERN_INFO "error sending signal\n");
-	}*/
-	do_send_sig_info(SIGKILL, SEND_SIG_PRIV, virus, PIDTYPE_TGID);
-	return 0;
-=======
 	    all_proc[i].name = task->comm;
 	    all_proc[i].pid = task->pid;
             i++;
@@ -108,7 +61,6 @@ int kill_syscall(struct task_struct *virus){
         printk(KERN_INFO "Kernel hijack successful");
 	return 1;
         
->>>>>>> e6dfba798e4358753b73d761ac16e27abb078522:kernel/scan.c
 }
 
 //Verify syscall table
@@ -157,28 +109,6 @@ static void replace_syscall(ulong offset, ulong func_address)
         }
 }
 
-<<<<<<< HEAD:scan.c
-//Hijack syscall for change_syscall
-static void replace_syscall2(ulong offset, ulong func_address)
-{
-
-        syscall_table = (ulong *)kallsyms_lookup_name(SYS_CALL_TABLE);
-
-        if (is_syscall_table(syscall_table)) {
-
-                printk(KERN_INFO "Syscall table address : %p\n", syscall_table);
-                page_read_write((ulong)syscall_table);
-                original_syscall = (void *)(syscall_table[offset]);
-                printk(KERN_INFO "Syscall at offset %lu : %p\n", offset, original_syscall2);
-                printk(KERN_INFO "Custom syscall address %p\n", kill_syscall);
-                syscall_table[offset] = func_address;
-                printk(KERN_INFO "Syscall hijacked\n");
-                printk(KERN_INFO "Syscall at offset %lu : %p\n", offset, (void *)syscall_table[offset]);
-                page_read_only((ulong)syscall_table);
-        }
-}
-=======
->>>>>>> e6dfba798e4358753b73d761ac16e27abb078522:kernel/scan.c
 //Initialize Module
 static int init_syscall(void)
 {
@@ -201,10 +131,5 @@ module_init(init_syscall);
 module_exit(cleanup_syscall);
 
 
-<<<<<<< HEAD:scan.c
-
-MODULE_DESCRIPTION("A kernel module for simple malware scanner");
-=======
 MODULE_LICENSE("GPL v2");
 MODULE_DESCRIPTION("A kernel module for simple malware scanner");
->>>>>>> e6dfba798e4358753b73d761ac16e27abb078522:kernel/scan.c
