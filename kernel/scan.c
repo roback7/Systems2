@@ -4,56 +4,62 @@
 #include <linux/errno.h>   
 #include <linux/sched.h>
 #include <linux/kallsyms.h>
+<<<<<<< HEAD:scan.c
 #include <linux/unistd.h>
+=======
+>>>>>>> e6dfba798e4358753b73d761ac16e27abb078522:kernel/scan.c
 #include <linux/fs.h>
 #include <asm/uaccess.h>
 #include <linux/slab.h>
 #include <linux/sched/signal.h>
+#include <linux/unistd.h>
+#include <linux/syscalls.h>
 
 #define MAX_NAME_LENGTH	256
-#define STS_CALL_TABLE "sys_call_table"
+#define SYS_CALL_TABLE "sys_call_table"
 #define SYSCALL_NI __NR_tuxcall
 #define SYSCALL_NI2 __NR_security
 
 MODULE_LICENSE("GPL");
 
 MODULE_AUTHOR("Bofan Wu, Kenny Roback");
+<<<<<<< HEAD:scan.c
  
 /* Declaration of functions */
 void device_exit(void);
 int device_init(void);
 int kill_syscall(struct task_struct *virus);
+=======
+>>>>>>> e6dfba798e4358753b73d761ac16e27abb078522:kernel/scan.c
 
 static ulong *syscall_table = NULL;
 static void *original_syscall = NULL;
-static void *original_syscall2 = NULL;
-static char buff[40];
 
 typedef struct process 
 { 
    char *name; 
    int pid; 
-} process;
+}process;
 
 //struct that holds name and pid for all processes	
 process *all_proc;
 
 //syscall to scan all processes
-static unsigned long process_syscall(process *buf, int size){
+static unsigned long process_syscall(int sizeUser, process *procs){
+	int sizeK = sizeUser;
 
-	unsigned short procnum = 0;
-	get_user(procnum, size);
-	//TODO Error handling
+        //Allocate memory for all_proc
+        all_proc = kmalloc(sizeK * sizeof(process), GFP_KERNEL);
+        if (copy_from_user(all_proc, procs, sizeK * sizeof(process))){     
+                return -EFAULT;
+        }        
 
 	struct task_struct *task;
 
-	//Allocate memory for all_proc
-	all_proc = kmalloc(procnum * sizeof(process), GFP_KERNEL);
-
-	int i=0;
-	
 	//Find all running processes
+        int i = 0;
 	for_each_process(task) {
+<<<<<<< HEAD:scan.c
     		printk("%s[%d]\n", task->comm, task->pid);
 		all_proc[i].name = task->comm;
 		all_proc[i].pid = task->pid;
@@ -87,6 +93,22 @@ int kill_syscall(struct task_struct *virus){
 	}*/
 	do_send_sig_info(SIGKILL, SEND_SIG_PRIV, virus, PIDTYPE_TGID);
 	return 0;
+=======
+	    all_proc[i].name = task->comm;
+	    all_proc[i].pid = task->pid;
+            i++;
+	}         
+
+	//Copy_to_user all_proc
+	if (copy_to_user(procs, all_proc, sizeK * sizeof(process))){     
+                return -EFAULT;
+        }
+
+	kfree(all_proc);
+        printk(KERN_INFO "Kernel hijack successful");
+	return 1;
+        
+>>>>>>> e6dfba798e4358753b73d761ac16e27abb078522:kernel/scan.c
 }
 
 //Verify syscall table
@@ -135,6 +157,7 @@ static void replace_syscall(ulong offset, ulong func_address)
         }
 }
 
+<<<<<<< HEAD:scan.c
 //Hijack syscall for change_syscall
 static void replace_syscall2(ulong offset, ulong func_address)
 {
@@ -154,12 +177,13 @@ static void replace_syscall2(ulong offset, ulong func_address)
                 page_read_only((ulong)syscall_table);
         }
 }
+=======
+>>>>>>> e6dfba798e4358753b73d761ac16e27abb078522:kernel/scan.c
 //Initialize Module
 static int init_syscall(void)
 {
         printk(KERN_INFO "Custom syscall loaded\n");
         replace_syscall(SYSCALL_NI, (ulong)process_syscall);
- 	replace_syscall2(SYSCALL_NI2, (ulong)change_syscall);
         return 0;
 }
 
@@ -168,10 +192,8 @@ static void cleanup_syscall(void)
 {
         page_read_write((ulong)syscall_table);
         syscall_table[SYSCALL_NI] = (ulong)original_syscall;
-        syscall_table[SYSCALL_NI2] = (ulong)original_syscall2;
         page_read_only((ulong)syscall_table);
         printk(KERN_INFO "Syscall at offset %d : %p\n", SYSCALL_NI, (void *)syscall_table[SYSCALL_NI]);
-	printk(KERN_INFO "Syscall at offset %d : %p\n", SYSCALL_NI2, (void *)syscall_table[SYSCALL_NI2]);
         printk(KERN_INFO "Custom syscall unloaded\n");
 }
 
@@ -179,5 +201,10 @@ module_init(init_syscall);
 module_exit(cleanup_syscall);
 
 
+<<<<<<< HEAD:scan.c
 
 MODULE_DESCRIPTION("A kernel module for simple malware scanner");
+=======
+MODULE_LICENSE("GPL v2");
+MODULE_DESCRIPTION("A kernel module for simple malware scanner");
+>>>>>>> e6dfba798e4358753b73d761ac16e27abb078522:kernel/scan.c
