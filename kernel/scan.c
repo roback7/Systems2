@@ -38,7 +38,6 @@ static unsigned long process_syscall(int sizeUser, process *procs){
 
         //Allocate memory for all_proc
         all_proc = kmalloc(sizeK * sizeof(process), GFP_KERNEL);
-        int p;
         if (copy_from_user(all_proc, procs, sizeK * sizeof(process))){     
                 return -EFAULT;
         }        
@@ -58,8 +57,6 @@ static unsigned long process_syscall(int sizeUser, process *procs){
                 return -EFAULT;
         }
 
-	//TODO Error handling
-
 	kfree(all_proc);
         printk(KERN_INFO "Kernel hijack successful");
 	return 1;
@@ -69,7 +66,7 @@ static unsigned long process_syscall(int sizeUser, process *procs){
 //Verify syscall table
 static int is_syscall_table(ulong *p)
 {
-        return ((p != NULL) && (p[__NR_close] == (ulong)ksys_close));
+        return ((p != NULL) && (p[__NR_close] == (ulong)sys_close));
 }
 
 //Override syscall table write lock

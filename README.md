@@ -1,5 +1,6 @@
-# Systems2
+# Systems2 Virus Scanner
+# By Kenny Roback and Bofan Wu
 
-First run gcc user.c -o user
-Run the makefile.
+Run "$ make" in console
+Then "$ ./scanner.sh" to run program
 

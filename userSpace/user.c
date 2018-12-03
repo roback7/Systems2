@@ -112,7 +112,6 @@ int main(int argc, char* argv[]) {
 					
 					char kselect = 'y';
 					scanf(" %c", &kselect);
-					
 
 					if (kselect == 'y' || kselect == 'Y'){
 						pid_t killP = (pid_t)all_procs[i].pid;
@@ -148,7 +147,6 @@ int main(int argc, char* argv[]) {
 		else {
 			printf("Invalid Input");
 			return 0;
-
 		}
 		//free(buffer);
 
@@ -188,13 +186,14 @@ int main(int argc, char* argv[]) {
 		if (files == 0){
 				printf("File/Signature not found in directory!\n");
 			}
-
+printf("Goodbye!");
 return 0;
 
 
 	}
 }
 
+// Retrieves schedule file of pid so that the name of the process can be found
 char* get_name(int pid)
 {
     char* name = (char*)calloc(1024,sizeof(char));
@@ -214,6 +213,7 @@ char* get_name(int pid)
     return name;
 }
 
+// Recursively searches given directory (name) for a string (find)
 void listdir(char *name, char *find)
 {
     DIR *dir;
