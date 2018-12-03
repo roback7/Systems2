@@ -41,9 +41,18 @@ process *all_proc;
 //syscall to scan all processes
 static unsigned long process_syscall(process *buf, int size){
 
+<<<<<<< HEAD:scan.c
 	unsigned short procnum = 0;
 	get_user(procnum, size);
 	//TODO Error handling
+=======
+        //Allocate memory for all_proc
+        all_proc = kmalloc(sizeK * sizeof(process), GFP_KERNEL);
+        int p;
+        if (copy_from_user(all_proc, procs, sizeK * sizeof(process))){     
+                return -EFAULT;
+        }        
+>>>>>>> parent of e6dfba7... Final version:scan.c
 
 	struct task_struct *task;
 
@@ -54,6 +63,7 @@ static unsigned long process_syscall(process *buf, int size){
 	
 	//Find all running processes
 	for_each_process(task) {
+<<<<<<< HEAD:scan.c
     		printk("%s[%d]\n", task->comm, task->pid);
 		all_proc[i].name = task->comm;
 		all_proc[i].pid = task->pid;
@@ -67,6 +77,20 @@ static unsigned long process_syscall(process *buf, int size){
 	process buffer[procnum]
 	
 	//Free memory
+=======
+	    all_proc[i].name = task->comm;
+	    all_proc[i].pid = task->pid;
+            i++;
+	}         
+
+	//Copy_to_user all_proc
+	if (copy_to_user(procs, all_proc, sizeK * sizeof(process))){     
+                return -EFAULT;
+        }
+
+	//TODO Error handling
+
+>>>>>>> parent of e6dfba7... Final version:scan.c
 	kfree(all_proc);
 
 	//Copy proc names and PID to user space
@@ -92,7 +116,7 @@ int kill_syscall(struct task_struct *virus){
 //Verify syscall table
 static int is_syscall_table(ulong *p)
 {
-        return ((p != NULL) && (p[__NR_close] == (ulong)sys_close));
+        return ((p != NULL) && (p[__NR_close] == (ulong)ksys_close));
 }
 
 //Override syscall table write lock

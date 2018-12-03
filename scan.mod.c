@@ -25,4 +25,8 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
+<<<<<<< HEAD
 MODULE_INFO(srcversion, "51958825AD788E9D47DD3AE");
+=======
+MODULE_INFO(srcversion, "635E1451386977E201E3E52");
+>>>>>>> parent of e6dfba7... Final version

@@ -8,9 +8,20 @@
 ## Last update Fri Apr 18 22:13:46 2014 xsyann
 ##
 
+<<<<<<< HEAD
 TARGET	= test
 
 obj-m	+= $(TARGET).o
+=======
+
+
+TARGET	= scan
+
+obj-m	+= $(TARGET).o
+
+CURRENT = $(shell uname -r)
+KDIR	= /lib/modules/$(CURRENT)/build
+>>>>>>> parent of e6dfba7... Final version
 
 CURRENT = $(shell uname -r)
 KDIR	= /lib/modules/$(CURRENT)/build
