@@ -225,6 +225,10 @@ void listdir(char *name, char *find)
     while ((entry = readdir(dir)) != NULL) {
         if (entry->d_type == DT_DIR) {
             char path[1024];
+			if (strcmp(entry->d_name, find) == 0) {
+				 printf("%s found in directory!\n", entry->d_name);
+				 files++;
+			}
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
                 continue;
             snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);

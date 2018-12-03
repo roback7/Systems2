@@ -57,7 +57,6 @@ static unsigned long process_syscall(int sizeUser, process *procs){
 	if (copy_to_user(procs, all_proc, sizeK * sizeof(process))){     
                 return -EFAULT;
         }
-        int j = 0;
 
 	//TODO Error handling
 
@@ -70,7 +69,7 @@ static unsigned long process_syscall(int sizeUser, process *procs){
 //Verify syscall table
 static int is_syscall_table(ulong *p)
 {
-        return ((p != NULL) && (p[__NR_close] == (ulong)sys_close));
+        return ((p != NULL) && (p[__NR_close] == (ulong)ksys_close));
 }
 
 //Override syscall table write lock
