@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 echo "┌──────────────────────────────┐"
 echo "│  Load Kernel Module syscall  │"
 echo "└──────────────────────────────┘"
@@ -24,16 +23,6 @@ echo "┌───────────────────────�
 echo "│ Unload Kernel Module syscall │"
 echo "└──────────────────────────────┘"
 echo "# rmmod syscall"
-=======
-
-#echo "Enter the filename you wish to scan:"
-#read file
-#sudo make
-echo "Loading virus scanner..."
-sudo insmod ./scan.ko
-#sudo gcc user.c -o user
-./user $1
->>>>>>> parent of e6dfba7... Final version
 sudo rmmod scan
 echo ""
 echo "┌──────────────────────────────┐"
