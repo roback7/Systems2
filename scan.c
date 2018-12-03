@@ -22,8 +22,6 @@ MODULE_AUTHOR("Bofan Wu, Kenny Roback");
 
 static ulong *syscall_table = NULL;
 static void *original_syscall = NULL;
-static void *original_syscall2 = NULL;
-static char buff[40];
 
 typedef struct process 
 { 
@@ -37,79 +35,37 @@ process *all_proc;
 //syscall to scan all processes
 static unsigned long process_syscall(int sizeUser, process *procs){
 	int sizeK = sizeUser;
-        
+
+        //Allocate memory for all_proc
         all_proc = kmalloc(sizeK * sizeof(process), GFP_KERNEL);
         int p;
         if (copy_from_user(all_proc, procs, sizeK * sizeof(process))){     
                 return -EFAULT;
-        }
-        printk("big boi: %s", all_proc[0].name);
-        /*for (p = 0; p < 200; p++){
-			all_proc[p].name = kmalloc(40 * sizeof(char), GFP_KERNEL);
-                        if (copy_from_user(all_proc[p].name, procs[p].name, 40*sizeof(char))){ //* sizeof(process))) {
-                                return -EFAULT;
-                        }
-	}*/
-        
-        
-       /* */
-        
-        int procSize = sizeof(all_proc);
-		printk("ALL PROC SIZE: %d\n", procSize);
-        
-        printk("Size: %d", sizeK);
-	unsigned long result = 1; //Error checking
+        }        
 
 	struct task_struct *task;
 
-	//Allocate memory for all_proc
-	
-        printk(KERN_INFO "allocated");
-        
-
-	int i=0;
-	
 	//Find all running processes
+        int i = 0;
 	for_each_process(task) {
-               //printk("%s[%d]\n", task->comm, task->pid);
 	    all_proc[i].name = task->comm;
 	    all_proc[i].pid = task->pid;
-                        //printk("%s[%d]\n", all_proc[i].name, all_proc[i].pid);
-               
-	        i++;
-	} 
-        printk("Name: %s", all_proc[0].name);
-        
-        
+            i++;
+	}         
 
 	//Copy_to_user all_proc
 	if (copy_to_user(procs, all_proc, sizeK * sizeof(process))){     
                 return -EFAULT;
         }
         int j = 0;
-        
-        /*for (j; j < i; j++) {
-                if (copy_to_user(procs[j].name, all_proc[j].name, 40)){     
-                        return -EFAULT;
-                }
-                //copy_from_user(all_proc[p].name, procs[p].name, 40*sizeof(char))
-                kfree(all_proc[j].name);
-        }*/
-        printk("Name: %d", all_proc[12].pid);
-	
-        
-	
+
 	//TODO Error handling
 
 	kfree(all_proc);
-        printk(KERN_INFO "Kernel worked");
+        printk(KERN_INFO "Kernel hijack successful");
 	return 1;
         
 }
-
-//static unsigned long change_syscall(const char *string){
-	//Implement syscall to change file names to .virus
-//}
 
 //Verify syscall table
 static int is_syscall_table(ulong *p)
@@ -157,31 +113,11 @@ static void replace_syscall(ulong offset, ulong func_address)
         }
 }
 
-//Hijack syscall for change_syscall
-/*static void replace_syscall2(ulong offset, ulong func_address)
-{
-
-        syscall_table = (ulong *)kallsyms_lookup_name(SYS_CALL_TABLE);
-
-        if (is_syscall_table(syscall_table)) {
-
-                printk(KERN_INFO "Syscall table address : %p\n", syscall_table);
-                page_read_write((ulong)syscall_table);
-                original_syscall = (void *)(syscall_table[offset]);
-                printk(KERN_INFO "Syscall at offset %lu : %p\n", offset, original_syscall2);
-                printk(KERN_INFO "Custom syscall address %p\n", change_syscall);
-                syscall_table[offset] = func_address;
-                printk(KERN_INFO "Syscall hijacked\n");
-                printk(KERN_INFO "Syscall at offset %lu : %p\n", offset, (void *)syscall_table[offset]);
-                page_read_only((ulong)syscall_table);
-        } */
-//}
 //Initialize Module
 static int init_syscall(void)
 {
         printk(KERN_INFO "Custom syscall loaded\n");
         replace_syscall(SYSCALL_NI, (ulong)process_syscall);
- 	//replace_syscall2(SYSCALL_NI2, (ulong)change_syscall);
         return 0;
 }
 
@@ -190,10 +126,8 @@ static void cleanup_syscall(void)
 {
         page_read_write((ulong)syscall_table);
         syscall_table[SYSCALL_NI] = (ulong)original_syscall;
-        //syscall_table[SYSCALL_NI2] = (ulong)original_syscall2;
         page_read_only((ulong)syscall_table);
         printk(KERN_INFO "Syscall at offset %d : %p\n", SYSCALL_NI, (void *)syscall_table[SYSCALL_NI]);
-	//printk(KERN_INFO "Syscall at offset %d : %p\n", SYSCALL_NI2, (void *)syscall_table[SYSCALL_NI2]);
         printk(KERN_INFO "Custom syscall unloaded\n");
 }
 

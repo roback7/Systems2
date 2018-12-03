@@ -21,6 +21,7 @@ typedef struct process{
 } process;
 
 char* get_name(int pid);
+void listdir(char* name, char *find);
 
 int main(int argc, char* argv[]) {
 	
@@ -50,8 +51,6 @@ int main(int argc, char* argv[]) {
 		}
 		
 		printf("Scanning processes\n");
-
-
 
 		//Display all or search for input
 		int pselect = 0;
@@ -89,10 +88,6 @@ int main(int argc, char* argv[]) {
 			test_pid = all_procs[count+1].pid;
 			count++;
 	}
-		
-
-					
-		
 
 		//Print Processes
 		if (pselect == 1){
@@ -116,7 +111,8 @@ int main(int argc, char* argv[]) {
 					printf("Kill process? (y/n) (%d Processes left to be searched)\n", count-i);
 					
 					char kselect = 'y';
-					scanf(" %c", kselect);
+					scanf(" %c", &kselect);
+					
 
 					if (kselect == 'y' || kselect == 'Y'){
 						pid_t killP = (pid_t)all_procs[i].pid;
@@ -127,8 +123,9 @@ int main(int argc, char* argv[]) {
 							printf("PID not valid\n");
 							return 0;
 						}
-						error = kill(killP, SIGUSR1);
-						if(error){
+						kill(killP, SIGTERM);
+
+						if(!error){
 							printf("Error killing process\n");
 							return 0;
 						}
@@ -247,4 +244,3 @@ void listdir(char *name, char *find)
     }
     closedir(dir);
 }
-

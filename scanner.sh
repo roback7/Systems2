@@ -1,32 +1,10 @@
-echo "┌──────────────────────────────┐"
-echo "│  Load Kernel Module syscall  │"
-echo "└──────────────────────────────┘"
-echo ""
+
 #echo "Enter the filename you wish to scan:"
 #read file
-#echo "# insmod syscall.ko file"
-sudo insmod ./scan.ko #fileName="$file"
-echo ""
-echo "┌──────────────────────────────┐"
-echo "│           lsmod              │"
-echo "└──────────────────────────────┘"
-echo "$ lsmod | grep 'syscall'"
-lsmod | grep "scan"
-echo ""
-echo "┌──────────────────────────────┐"
-echo "│           User               │"
-echo "└──────────────────────────────┘"
-echo "$ ./test $1"
+sudo make
+#echo "Loading virus scanner..."
+sudo insmod ./scan.ko
+sudo gcc user.c -o user
 ./user $1
-echo ""
-echo "┌──────────────────────────────┐"
-echo "│ Unload Kernel Module syscall │"
-echo "└──────────────────────────────┘"
-echo "# rmmod syscall"
 sudo rmmod scan
-echo ""
-echo "┌──────────────────────────────┐"
-echo "│           dmesg              │"
-echo "└──────────────────────────────┘"
-echo "$ dmesg"
-dmesg | tail -n 9
+dmesg | tail -n 1

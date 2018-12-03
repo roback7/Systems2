@@ -8,12 +8,15 @@
 ## Last update Fri Apr 18 22:13:46 2014 xsyann
 ##
 
+
+
 TARGET	= scan
 
 obj-m	+= $(TARGET).o
 
 CURRENT = $(shell uname -r)
 KDIR	= /lib/modules/$(CURRENT)/build
+
 
 all:
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
