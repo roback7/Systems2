@@ -29,49 +29,82 @@ typedef struct process
 { 
    char *name; 
    int pid; 
-} process;
+}process;
 
 //struct that holds name and pid for all processes	
 process *all_proc;
 
 //syscall to scan all processes
-static unsigned long process_syscall(int *sizes, process *procs){
-	int size[1];
-         if (copy_from_user(size, sizes, 1)) {
-               return -EFAULT;
+static unsigned long process_syscall(int sizeUser, process *procs){
+	int sizeK = sizeUser;
+        
+        all_proc = kmalloc(sizeK * sizeof(process), GFP_KERNEL);
+        int p;
+        if (copy_from_user(all_proc, procs, sizeK * sizeof(process))){     
+                return -EFAULT;
         }
-        all_proc = kmalloc(size[0] * sizeof(process), GFP_KERNEL);
+        printk("big boi: %s", all_proc[0].name);
+        /*for (p = 0; p < 200; p++){
+			all_proc[p].name = kmalloc(40 * sizeof(char), GFP_KERNEL);
+                        if (copy_from_user(all_proc[p].name, procs[p].name, 40*sizeof(char))){ //* sizeof(process))) {
+                                return -EFAULT;
+                        }
+	}*/
         
         
-        printk(KERN_INFO "allocated12");
-	unsigned long result = 0; //Error checking
+       /* */
+        
+        int procSize = sizeof(all_proc);
+		printk("ALL PROC SIZE: %d\n", procSize);
+        
+        printk("Size: %d", sizeK);
+	unsigned long result = 1; //Error checking
 
 	struct task_struct *task;
 
 	//Allocate memory for all_proc
 	
         printk(KERN_INFO "allocated");
+        
 
 	int i=0;
 	
 	//Find all running processes
 	for_each_process(task) {
-	all_proc[i].name = task->comm;
-	all_proc[i].pid = task->pid;
-	i++;
-	}
+               //printk("%s[%d]\n", task->comm, task->pid);
+	    all_proc[i].name = task->comm;
+	    all_proc[i].pid = task->pid;
+                        //printk("%s[%d]\n", all_proc[i].name, all_proc[i].pid);
+               
+	        i++;
+	} 
+        printk("Name: %s", all_proc[0].name);
+        
+        
 
 	//Copy_to_user all_proc
-	int error = copy_to_user(procs, all_proc, size[0] * sizeof(process));
-	if (error){
-		printk(KERN_INFO "Failed to copy all_proc");
-		return error;
-	}
+	if (copy_to_user(procs, all_proc, sizeK * sizeof(process))){     
+                return -EFAULT;
+        }
+        int j = 0;
+        
+        /*for (j; j < i; j++) {
+                if (copy_to_user(procs[j].name, all_proc[j].name, 40)){     
+                        return -EFAULT;
+                }
+                //copy_from_user(all_proc[p].name, procs[p].name, 40*sizeof(char))
+                kfree(all_proc[j].name);
+        }*/
+        printk("Name: %d", all_proc[12].pid);
+	
+        
 	
 	//TODO Error handling
 
 	kfree(all_proc);
-	return result;
+        printk(KERN_INFO "Kernel worked");
+	return 1;
+        
 }
 
 //static unsigned long change_syscall(const char *string){
@@ -81,7 +114,7 @@ static unsigned long process_syscall(int *sizes, process *procs){
 //Verify syscall table
 static int is_syscall_table(ulong *p)
 {
-        return ((p != NULL) && (p[__NR_close] == (ulong)ksys_close));
+        return ((p != NULL) && (p[__NR_close] == (ulong)sys_close));
 }
 
 //Override syscall table write lock

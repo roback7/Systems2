@@ -20,6 +20,7 @@ typedef struct process{
 	int pid;
 } process;
 
+char* get_name(int pid);
 
 int main(int argc, char* argv[]) {
 	
@@ -41,39 +42,63 @@ int main(int argc, char* argv[]) {
 		struct sysinfo info;
 		sysinfo (&info);
 
-		procs = info.procs;
-		unsigned long test = procs*sizeof(process);
-		
-		process *all_procs = malloc(procs*sizeof(process));
+		procs = info.procs;		
+		process *all_procs = malloc((unsigned long)procs*sizeof(process));
+
+		for (int i = 0; i < 200; i++){
+			all_procs[i].name = malloc(40 * sizeof(char));
+		}
 		
 		printf("Scanning processes\n");
-		int size = sizeof(all_procs)/sizeof(all_procs[0]);
+
 
 
 		//Display all or search for input
 		int pselect = 0;
 		printf("Select an option\n");
 		printf("1) Display all processes\n");
-		printf("2) Search for specific process\n");
+		printf("2) Search for a specific process\n");
 		scanf("%d", &pselect);
 
 		char name[MAX_NAME_LENGTH];
 
 		//Syscall to scan processes
 
-		sizeProc[0] = size;
-		
-		int error = syscall(HIJACKED_SYSCALL, sizeProc, all_procs);
-		
-		if (error){
-			printf("Error performing system call");
+		int pid[(int)procs];	
+		int error = syscall(HIJACKED_SYSCALL, (int)procs, all_procs);
+		if (error == 0){
+			printf("Error performing system call\n");
+			return 0;
 		}
+
+		// Find process name for given pid
+		int test_pid = all_procs[0].pid;
+		int count = 0;
+		while (test_pid != NULL) {
+			char *searchForName = get_name(all_procs[count].pid);
+			char *findSpace;
+			int index;
+
+			findSpace = strchr(searchForName, ' ');
+			index = (int)(findSpace - searchForName);
+			char *pName = malloc(40);
+			for (int i = 0; i < index; i++) {
+				pName[i] = searchForName[i];
+			}
+			all_procs[count].name = pName;
+			test_pid = all_procs[count+1].pid;
+			count++;
+	}
+		
+
+					
+		
 
 		//Print Processes
 		if (pselect == 1){
 	
-			for (int i = 0; i < size; i++){
-				printf("%s\n", all_procs[i].name);
+			for (int i = 0; i < count; i++){
+				printf("%s [%d]\n", all_procs[i].name, all_procs[i].pid);
 			}
 		}
 		//Search through processes
@@ -81,17 +106,20 @@ int main(int argc, char* argv[]) {
 			
 			printf("Enter name to search for\n");
 			scanf("%s", name);
-			for (int i = 0; i < size; i++){
+			for (int i = 0; i < count; i++){
 
 				if (strcmp(all_procs[i].name, name) == 0){
 
 					//Ask to kill process if found
-					printf("%s\n %d",all_procs[i].name, all_procs[i].pid);
+					printf("%s [%d]\n",all_procs[i].name, all_procs[i].pid);
 					printf("Process found\n");
-					printf("Kill process? (y/n) (%d Processes left to be 							searched)\n", size-i);
-					char kselect = NULL;
-					scanf("%c", kselect);
+					printf("Kill process? (y/n) (%d Processes left to be searched)\n", count-i);
+					
+					char kselect = 'y';
+					scanf(" %c", kselect);
+
 					if (kselect == 'y' || kselect == 'Y'){
+						pid_t killP = (pid_t)all_procs[i].pid;
 
 						//Kill Process(es)
 						int check = all_procs[i].pid;
@@ -99,7 +127,7 @@ int main(int argc, char* argv[]) {
 							printf("PID not valid\n");
 							return 0;
 						}
-						error = kill(all_procs[i].pid, SIGTERM);
+						error = kill(killP, SIGUSR1);
 						if(error){
 							printf("Error killing process\n");
 							return 0;
@@ -115,7 +143,9 @@ int main(int argc, char* argv[]) {
 						return 0;
 					}
 				}
+				
 			}
+			
 
 		}
 		else {
@@ -166,6 +196,25 @@ return 0;
 
 
 	}
+}
+
+char* get_name(int pid)
+{
+    char* name = (char*)calloc(1024,sizeof(char));
+    if(name){
+        sprintf(name, "/proc/%d/sched", pid);
+        FILE* f = fopen(name,"r");
+        if(f){
+            size_t size;
+            size = fread(name, sizeof(char), 1024, f);
+            if(size>0){
+                if('\n'==name[size-1])
+                    name[size-1]='\0';
+            }
+            fclose(f);
+        }
+    }
+    return name;
 }
 
 void listdir(char *name, char *find)

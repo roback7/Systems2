@@ -1,3 +1,3 @@
-/home/kenny/Desktop/otherbranch/Systems2/scan.ko
-/home/kenny/Desktop/otherbranch/Systems2/scan.o
+/home/ken/Desktop/newbranch/Systems2/scan.ko
+/home/ken/Desktop/newbranch/Systems2/scan.o
 
